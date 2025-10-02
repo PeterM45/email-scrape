@@ -4,8 +4,12 @@
 	"description": "Toolkit for extracting email addresses from HTML and remote websites",
 	"type": "module",
 	"main": "src/index.js",
+	"types": "src/index.d.ts",
 	"exports": {
-		".": "./src/index.js"
+		".": {
+			"types": "./src/index.d.ts",
+			"default": "./src/index.js"
+		}
 	},
 	"files": [
 		"src",
