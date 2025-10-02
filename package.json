@@ -30,7 +30,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/peterm45/email-scrape.git"
+		"url": "git+https://github.com/PeterM45/email-scrape.git"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.5",
