@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { scrapeEmailsFromWebsite } from "../src/index.js";
+import {
+	scrapeEmailFromWebsite,
+	scrapeEmailsFromWebsite,
+} from "../src/index.js";
 
 // Real-world integration tests that actually hit live websites
 // These verify the scraper works on actual production sites
 
-test("Real integration: miltonscuisine.com extracts email", async () => {
+test("Real integration: miltonscuisine.com extracts emails (plural)", async () => {
 	const emails = await scrapeEmailsFromWebsite(
 		"https://www.miltonscuisine.com",
 	);
@@ -16,6 +19,18 @@ test("Real integration: miltonscuisine.com extracts email", async () => {
 	assert.ok(
 		emails.includes("miltons@sphospitality.com"),
 		`Should extract miltons@sphospitality.com. Got: ${JSON.stringify(emails)}`,
+	);
+});
+
+test("Real integration: miltonscuisine.com extracts single email", async () => {
+	const email = await scrapeEmailFromWebsite("https://www.miltonscuisine.com");
+
+	console.log("miltonscuisine.com single email:", email);
+
+	assert.strictEqual(
+		email,
+		"miltons@sphospitality.com",
+		`Should return miltons@sphospitality.com. Got: ${email}`,
 	);
 });
 
