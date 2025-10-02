@@ -20,7 +20,9 @@
 		"lint": "biome lint",
 		"format": "biome format --write",
 		"check": "biome check --write --unsafe",
-		"test": "node --test",
+		"test": "node --test test/index.test.js",
+		"test:integration": "node --test test/integration.test.js",
+		"test:all": "node --test",
 		"clean": "node scripts/clean.mjs",
 		"release": "changeset publish"
 	},

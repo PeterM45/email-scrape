@@ -48,7 +48,13 @@ export function sanitizeEmail(raw) {
 
 	// Reject if domain doesn't have a valid TLD
 	const tld = domain.split(".").pop();
-	if (!tld || tld.length < 2) {
+	if (!tld || tld.length < 2 || tld.length > 24) {
+		return null;
+	}
+
+	// Reject TLDs that contain only lowercase letters followed by uppercase
+	// This catches cases like "comFollow" being incorrectly extracted as TLD
+	if (tld !== tld.toLowerCase() && tld !== tld.toUpperCase()) {
 		return null;
 	}
 
