@@ -10,6 +10,8 @@ export interface FetchOptions {
 	userAgent?: string;
 	/** Additional headers to merge with defaults */
 	headers?: Record<string, string>;
+	/** If true, also discover and scrape contact/about pages (default: true) */
+	followContactPages?: boolean;
 }
 
 /**

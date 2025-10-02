@@ -17,7 +17,42 @@ export function sanitizeEmail(raw) {
 		return null;
 	}
 
-	return trimmed.toLowerCase();
+	const lower = trimmed.toLowerCase();
+
+	// Additional validation checks
+	const [localPart, domain] = lower.split("@");
+
+	// Reject if local part or domain is too short
+	if (localPart.length < 1 || domain.length < 3) {
+		return null;
+	}
+
+	// Reject if local part doesn't start with letter or digit
+	if (!/^[a-z0-9]/.test(localPart)) {
+		return null;
+	}
+
+	// Reject common invalid patterns
+	if (
+		localPart.startsWith(".") ||
+		localPart.endsWith(".") ||
+		localPart.includes("..") ||
+		domain.startsWith(".") ||
+		domain.endsWith(".") ||
+		domain.includes("..") ||
+		domain.startsWith("-") ||
+		domain.endsWith("-")
+	) {
+		return null;
+	}
+
+	// Reject if domain doesn't have a valid TLD
+	const tld = domain.split(".").pop();
+	if (!tld || tld.length < 2) {
+		return null;
+	}
+
+	return lower;
 }
 
 export function normalizeEmails(inputs) {

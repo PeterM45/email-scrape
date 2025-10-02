@@ -1,4 +1,7 @@
-export const EMAIL_PATTERN = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+// More strict email pattern - must start with a letter
+// Uses negative lookbehind to ensure no letter/digit/dot before (prevents matching parts of emails)
+export const EMAIL_PATTERN =
+	"(?<![a-zA-Z0-9.])[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\\.[a-zA-Z]{2,}\\b";
 
 export const ATTRIBUTE_SELECTORS = [
 	"[data-email]",

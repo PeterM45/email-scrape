@@ -21,11 +21,24 @@ import {
 const emails = extractEmails("Contact us at hello@example.com");
 
 // Fetch a webpage and return ranked list of emails
+// Automatically checks contact/about pages for more emails
 const ranked = await scrapeEmailsFromWebsite("https://example.com");
+
+// Skip contact page discovery for faster scraping
+const main = await scrapeEmailsFromWebsite("https://example.com", {
+	followContactPages: false,
+});
 
 // Convenience helper returning the single highest-ranked email
 const top = await scrapeEmailFromWebsite("https://example.com");
 ```
+
+## Features
+
+- **Smart email validation**: Rejects malformed emails and text that looks like emails but isn't properly formatted
+- **Contact page discovery**: Automatically finds and scrapes `/contact`, `/about`, and similar pages for additional email addresses
+- **Ranked results**: Returns emails sorted by source quality (mailto links ranked highest, then structured data, then plain text)
+- **Keyword boosting**: Emails containing keywords like "support", "contact", "info" get higher rankings
 
 ### Options
 
@@ -35,6 +48,7 @@ const top = await scrapeEmailFromWebsite("https://example.com");
 - `signal`: abort signal to cancel the request.
 - `userAgent`: override the default user-agent string.
 - `headers`: additional headers to merge with defaults.
+- `followContactPages`: if true (default), automatically discovers and scrapes contact/about pages for additional emails.
 
 ## Scripts
 

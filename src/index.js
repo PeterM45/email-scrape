@@ -1,5 +1,6 @@
-import { fetchHtml } from "./fetch-html.js";
+import { discoverContactPages } from "./discover-contact-pages.js";
 import { extractCandidates, rankCandidates } from "./extract-candidates.js";
+import { fetchHtml } from "./fetch-html.js";
 import {
 	extractEmails as extractEmailsFromString,
 	normalizeEmails,
@@ -25,6 +26,7 @@ export function extractEmails(input) {
  * @param {AbortSignal} [options.signal]
  * @param {string} [options.userAgent]
  * @param {Record<string, string>} [options.headers]
+ * @param {boolean} [options.followContactPages] - If true, also scrape contact/about pages
  * @returns {Promise<string[]>}
  */
 export async function scrapeEmailsFromWebsite(url, options = {}) {
@@ -44,17 +46,39 @@ export async function scrapeEmailsFromWebsite(url, options = {}) {
 		signal,
 		userAgent,
 		headers,
+		followContactPages = true,
 	} = options;
 
-	const html = await fetchHtml(normalizedUrl, fetchImpl, {
-		signal,
-		userAgent,
-		headers,
-	});
+	const fetchOptions = { signal, userAgent, headers };
 
+	// Scrape main page
+	const html = await fetchHtml(normalizedUrl, fetchImpl, fetchOptions);
 	const candidates = extractCandidates(html);
-	const ranked = rankCandidates(candidates);
 
+	// Optionally scrape contact pages
+	if (followContactPages) {
+		const contactUrls = discoverContactPages(html, normalizedUrl);
+
+		for (const contactUrl of contactUrls) {
+			try {
+				const contactHtml = await fetchHtml(
+					contactUrl,
+					fetchImpl,
+					fetchOptions,
+				);
+				const contactCandidates = extractCandidates(contactHtml);
+				candidates.push(...contactCandidates);
+			} catch (error) {
+				// Silently fail for contact pages - still return main page results
+				console.warn(
+					`Failed to scrape contact page ${contactUrl}:`,
+					error.message,
+				);
+			}
+		}
+	}
+
+	const ranked = rankCandidates(candidates);
 	return ranked.map((candidate) => candidate.email);
 }
 
