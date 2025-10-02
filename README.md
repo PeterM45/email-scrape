@@ -42,24 +42,43 @@ const top = await scrapeEmailFromWebsite("https://example.com");
 pnpm clean    # remove dist/coverage artifacts
 pnpm lint     # run Biome linting
 pnpm test     # execute node test runner
-pnpm release  # publish using changesets (requires NPM_TOKEN)
+pnpm release  # publish using changesets
 ```
 
 ## Publishing
 
-1. Run `pnpm changeset` to create a release note describing the change (choose semver bump).
-2. Merge the generated changeset PR (or commit) into `main`.
-3. Ensure `NPM_TOKEN` is configured in GitHub repository secrets.
-4. Push to `main`; the CI workflow runs tests and, on success, versions and publishes via Changesets.
+The project uses [Changesets](https://github.com/changesets/changesets) for version management and **npm provenance** for secure, transparent publishing.
 
-If you prefer to publish locally:
+### Automated Publishing (Recommended)
+
+1. **One-time setup** (if you haven't already):
+   - Go to [npmjs.com](https://www.npmjs.com/) → Account Settings → Access Tokens
+   - Create a new **Automation** token (granular access token with publish permission)
+   - In your GitHub repo: Settings → Secrets and variables → Actions → New repository secret
+   - Name it `NPM_TOKEN` and paste your token
+   - The workflow now uses this with npm provenance for secure publishing
+
+2. **To publish a new version**:
+   ```bash
+   pnpm changeset  # Describe your changes and choose semver bump (patch/minor/major)
+   git add .changeset/*
+   git commit -m "Add changeset for new feature"
+   git push
+   ```
+
+3. The CI workflow automatically:
+   - Detects the changeset
+   - Bumps the version in `package.json`
+   - Publishes to npm with cryptographic provenance
+   - Pushes version commits and tags back to the repo
+
+### Manual Publishing (if needed)
 
 ```bash
-export NPM_TOKEN=... # with publish rights
-pnpm changeset version
-pnpm install
-pnpm test
-pnpm release
+pnpm changeset version  # Bump version
+pnpm install            # Update lockfile
+pnpm test               # Run tests
+pnpm release            # Publish to npm
 ```
 
 ## Development

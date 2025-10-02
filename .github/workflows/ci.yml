@@ -30,9 +30,11 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
       contents: write
-      packages: write
+      id-token: write # Required for npm provenance
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for proper versioning
       - uses: pnpm/action-setup@v4
         with:
           version: 10
@@ -42,15 +44,39 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org/
       - run: pnpm install --frozen-lockfile
-      - run: pnpm changeset version
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test
-      - run: pnpm release
+      
+      # Check if there are changesets to process
+      - name: Check for changesets
+        id: changesets
+        run: |
+          if [ -n "$(ls .changeset/*.md 2>/dev/null | grep -v README)" ]; then
+            echo "has_changesets=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changesets=false" >> $GITHUB_OUTPUT
+          fi
+      
+      # Version and publish if changesets exist
+      - name: Version packages
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          pnpm changeset version
+          git add .
+          git commit -m "Version packages" || echo "No version changes"
+          pnpm install --frozen-lockfile
+      
+      - name: Build and test
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: pnpm test
+      
+      - name: Publish to npm with provenance
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: pnpm changeset publish --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Commit and push tag
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@users.noreply.github.com"
-          git push --follow-tags
-          git push
+          NPM_CONFIG_PROVENANCE: true
+      
+      - name: Push changes
+        if: steps.changesets.outputs.has_changesets == 'true'
+        run: git push --follow-tags
