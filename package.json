@@ -1,0 +1,42 @@
+{
+	"name": "email-scrape",
+	"version": "0.1.0",
+	"description": "Toolkit for extracting email addresses from HTML and remote websites",
+	"type": "module",
+	"main": "src/index.js",
+	"exports": {
+		".": "./src/index.js"
+	},
+	"files": [
+		"src",
+		"README.md",
+		"LICENSE"
+	],
+	"scripts": {
+		"lint": "biome lint",
+		"format": "biome format --write",
+		"check": "biome check --write --unsafe",
+		"test": "node --test",
+		"clean": "node scripts/clean.mjs",
+		"release": "changeset publish"
+	},
+	"keywords": [
+		"email",
+		"scrape",
+		"crawler",
+		"contact"
+	],
+	"author": "",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/peterm45/email-scrape.git"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.5",
+		"@changesets/cli": "^2.29.7"
+	},
+	"dependencies": {
+		"cheerio": "^1.1.2"
+	}
+}
