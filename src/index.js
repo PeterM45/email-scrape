@@ -51,12 +51,37 @@ export async function scrapeEmailsFromWebsite(url, options = {}) {
 
 	const fetchOptions = { signal, userAgent, headers };
 
-	// Scrape main page
-	const html = await fetchHtml(normalizedUrl, fetchImpl, fetchOptions);
+	let html;
+	let mainPageFailed = false;
+
+	// Try to scrape main page, fallback to /contact if it fails
+	try {
+		html = await fetchHtml(normalizedUrl, fetchImpl, fetchOptions);
+	} catch (error) {
+		mainPageFailed = true;
+		// If main page fails (e.g., 404), try /contact as fallback
+		if (followContactPages) {
+			try {
+				const baseUrl = new URL(normalizedUrl);
+				const contactUrl = `${baseUrl.origin}/contact`;
+				console.warn(
+					`Main page failed (${error.message}), trying fallback: ${contactUrl}`,
+				);
+				html = await fetchHtml(contactUrl, fetchImpl, fetchOptions);
+			} catch (_fallbackError) {
+				// Both main page and fallback failed
+				throw new Error(`Failed to fetch ${normalizedUrl}: ${error.message}`);
+			}
+		} else {
+			// No fallback allowed, re-throw original error
+			throw error;
+		}
+	}
+
 	const candidates = extractCandidates(html);
 
-	// Optionally scrape contact pages
-	if (followContactPages) {
+	// Optionally scrape contact pages (skip if we already used /contact as fallback)
+	if (followContactPages && !mainPageFailed) {
 		const contactUrls = discoverContactPages(html, normalizedUrl);
 
 		for (const contactUrl of contactUrls) {

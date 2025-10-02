@@ -191,3 +191,186 @@ test("scrapeEmailsFromWebsite can skip contact pages", async () => {
 
 	assert.strictEqual(fetchCount, 1, "Should only fetch main page");
 });
+
+test("Real-world: miltonscuisine.com should extract email from contact page", async () => {
+	const mainHtml = `
+		<html>
+			<body>
+				<nav>
+					<a href="/about">ABOUT US</a>
+					<a href="/contact">CONTACT</a>
+				</nav>
+				<p>800 Mayfield Road :: Milton, Ga 30009 :: Ph: 770.817.0161</p>
+			</body>
+		</html>
+	`;
+
+	const contactHtml = `
+		<html>
+			<body>
+				<h1>Contact Us</h1>
+				<p>Email us at <a href="mailto:miltons@sphospitality.com">miltons@sphospitality.com</a></p>
+			</body>
+		</html>
+	`;
+
+	const mockFetch = (url) => {
+		const html = url.includes("contact") ? contactHtml : mainHtml;
+		return Promise.resolve({
+			ok: true,
+			status: 200,
+			statusText: "OK",
+			text: async () => html,
+			headers: {
+				get: () => "text/html",
+			},
+		});
+	};
+
+	const emails = await scrapeEmailsFromWebsite(
+		"https://www.miltonscuisine.com",
+		{
+			fetch: mockFetch,
+		},
+	);
+
+	assert.ok(
+		emails.includes("miltons@sphospitality.com"),
+		"Should find email from contact page",
+	);
+});
+
+test("Real-world: marqueesteakhouse.com should extract clean email", async () => {
+	// Based on actual website content - in reality the HTML has more structure
+	// Even if rendered text appears concatenated, HTML usually has separation
+	const mainHtml = `
+		<html>
+			<body>
+				<h1>MARQUEE STEAKHOUSE</h1>
+				<div class="contact">
+					<p>204 Main Street East Milton ON L9T 1N8</p>
+					<p>(289) 878-5717</p>
+					<p>info@marqueesteakhouse.com</p>
+					<div class="social">
+						<a href="#">follow</a>
+						<a href="#">follow</a>
+						<a href="#">follow</a>
+					</div>
+				</div>
+			</body>
+		</html>
+	`;
+
+	const mockFetch = () => {
+		return Promise.resolve({
+			ok: true,
+			status: 200,
+			statusText: "OK",
+			text: async () => mainHtml,
+			headers: {
+				get: () => "text/html",
+			},
+		});
+	};
+
+	const emails = await scrapeEmailsFromWebsite(
+		"https://marqueesteakhouse.com",
+		{
+			fetch: mockFetch,
+		},
+	);
+
+	// Should extract the email cleanly
+	assert.ok(
+		emails.includes("info@marqueesteakhouse.com"),
+		`Should extract email. Got: ${JSON.stringify(emails)}`,
+	);
+});
+
+test("Real-world: handles 404 with fallback to /contact", async () => {
+	const mainHtml = `
+		<html>
+			<body>
+				<h1>Turtle Jacks Milton</h1>
+				<a href="/locations/turtle-jacks-milton">Our Location</a>
+				<a href="/contact">Contact Us</a>
+			</body>
+		</html>
+	`;
+
+	const contactHtml = `
+		<html>
+			<body>
+				<h1>Contact Us</h1>
+				<p>General inquiries: <a href="mailto:info@turtlejacks.com">info@turtlejacks.com</a></p>
+			</body>
+		</html>
+	`;
+
+	const fetchedUrls = [];
+	const mockFetch = (url) => {
+		fetchedUrls.push(url);
+
+		// Simulate 404 for the specific location page
+		if (url.includes("/locations/turtle-jacks-milton")) {
+			return Promise.resolve({
+				ok: false,
+				status: 404,
+				statusText: "Not Found",
+				text: async () => "<html><body>404 Not Found</body></html>",
+				headers: {
+					get: () => "text/html",
+				},
+			});
+		}
+
+		// Return contact page content
+		if (url.includes("/contact")) {
+			return Promise.resolve({
+				ok: true,
+				status: 200,
+				statusText: "OK",
+				text: async () => contactHtml,
+				headers: {
+					get: () => "text/html",
+				},
+			});
+		}
+
+		// Main page
+		return Promise.resolve({
+			ok: true,
+			status: 200,
+			statusText: "OK",
+			text: async () => mainHtml,
+			headers: {
+				get: () => "text/html",
+			},
+		});
+	};
+
+	const emails = await scrapeEmailsFromWebsite(
+		"https://turtlejacks.com/locations/turtle-jacks-milton/?utm_source=G&utm_medium=LPM&utm_campaign=MTY",
+		{
+			fetch: mockFetch,
+		},
+	);
+
+	// Should have attempted the location page
+	assert.ok(
+		fetchedUrls.some((url) => url.includes("/locations/turtle-jacks-milton")),
+		"Should try to fetch the location-specific page",
+	);
+
+	// Should have fallen back to contact page
+	assert.ok(
+		fetchedUrls.some((url) => url.includes("/contact")),
+		"Should fall back to /contact page after 404",
+	);
+
+	// Should extract email from contact page
+	assert.ok(
+		emails.includes("info@turtlejacks.com"),
+		"Should extract email from fallback contact page",
+	);
+});

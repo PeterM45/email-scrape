@@ -1,7 +1,8 @@
-// More strict email pattern - must start with a letter
-// Uses negative lookbehind to ensure no letter/digit/dot before (prevents matching parts of emails)
+// Email pattern - must start with a letter, not preceded by word characters or dots
+// TLD limited to 2-6 characters (covers most real TLDs) and must be followed by non-letter
+// This prevents matching emails embedded in other text without proper boundaries
 export const EMAIL_PATTERN =
-	"(?<![a-zA-Z0-9.])[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\\.[a-zA-Z]{2,}\\b";
+	"(?<![a-zA-Z0-9.])[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\\.[a-zA-Z]{2,6}(?![a-zA-Z])";
 
 export const ATTRIBUTE_SELECTORS = [
 	"[data-email]",
