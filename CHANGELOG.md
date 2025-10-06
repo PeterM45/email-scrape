@@ -1,5 +1,11 @@
 # email-scrape
 
+## 0.6.1
+
+### Patch Changes
+
+- 36cbce2: Add modern Biome config and standardize JSDoc comments. Improved linting rules enforce strict equality, no unused imports/variables, Node.js import protocol, and consistent code style. Added comprehensive JSDoc documentation to all public functions for better IDE integration and type hints.
+
 ## 0.6.0
 
 ### Minor Changes
