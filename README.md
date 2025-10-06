@@ -53,10 +53,15 @@ const top = await scrapeEmailFromWebsite("https://example.com");
 ## Scripts
 
 ```bash
-pnpm clean    # remove dist/coverage artifacts
-pnpm lint     # run Biome linting
-pnpm test     # execute node test runner
-pnpm release  # publish using changesets
+pnpm clean            # remove dist/coverage artifacts
+pnpm lint             # run Biome linting
+pnpm format           # format code with Biome
+pnpm check            # lint + format + auto-fix
+pnpm test             # run unit tests
+pnpm test:integration # run integration tests (hits live websites)
+pnpm test:all         # run all tests
+pnpm changeset        # create a changeset for version bump
+pnpm release          # publish using changesets
 ```
 
 ## Publishing

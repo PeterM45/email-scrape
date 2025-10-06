@@ -63,6 +63,7 @@ When main page fetch fails AND `followContactPages: true`:
 - **Pure ESM**: All imports use `.js` extensions (required for ESM)
 - No build step - ships source directly from `src/`
 - TypeScript types in separate `.d.ts` file, manually maintained
+- **JSDoc comments**: All public functions documented with JSDoc for IDE integration and type hints
 
 ### Error Handling
 - Throw `TypeError` for invalid inputs (e.g., non-string URLs, relative URLs)
