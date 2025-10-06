@@ -24,7 +24,8 @@
 		"test:integration": "node --test test/integration.test.js",
 		"test:all": "node --test",
 		"clean": "node scripts/clean.mjs",
-		"release": "changeset publish"
+		"release": "changeset publish",
+		"benchmark": "node --test test/benchmark.test.js"
 	},
 	"keywords": [
 		"email",
