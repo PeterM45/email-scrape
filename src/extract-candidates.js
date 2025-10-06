@@ -1,4 +1,4 @@
-import { load } from "cheerio";
+import { parse } from "node-html-parser";
 
 import {
 	ATTRIBUTE_SELECTORS,
@@ -15,7 +15,7 @@ import { extractEmails, sanitizeEmail } from "./sanitize.js";
  * @returns {Array<{email: string, score: number, source: string}>} Array of email candidates
  */
 export function extractCandidates(html) {
-	const $ = load(html);
+	const root = parse(html);
 	const candidates = new Map();
 
 	const addCandidate = (email, source, context = {}) => {
@@ -36,35 +36,39 @@ export function extractCandidates(html) {
 		}
 	};
 
-	const text = $("body").text();
+	const body = root.querySelector("body");
+	const text = body ? body.textContent : root.textContent;
 	for (const email of extractEmails(text)) {
 		addCandidate(email, "text");
 	}
 
-	$('a[href^="mailto:"]').each((_, element) => {
-		const href = $(element).attr("href");
+	const mailtoLinks = root.querySelectorAll('a[href^="mailto:"]');
+	for (const element of mailtoLinks) {
+		const href = element.getAttribute("href");
 		if (!href) {
-			return;
+			continue;
 		}
 		const email = href.replace(/^mailto:/i, "").split("?")[0];
 		addCandidate(email, "mailto");
-	});
+	}
 
-	$(ATTRIBUTE_SELECTORS.join(",")).each((_, element) => {
-		for (const attr of Object.keys(element.attribs ?? {})) {
-			const value = $(element).attr(attr);
+	const attributeElements = root.querySelectorAll(ATTRIBUTE_SELECTORS.join(","));
+	for (const element of attributeElements) {
+		for (const attr of Object.keys(element.attributes)) {
+			const value = element.getAttribute(attr);
 			if (value?.includes("@")) {
 				addCandidate(value, "attribute");
 			}
 		}
-	});
+	}
 
-	$(STRUCTURED_META_SELECTOR).each((_, element) => {
-		const value = $(element).attr("content");
+	const metaElements = root.querySelectorAll(STRUCTURED_META_SELECTOR);
+	for (const element of metaElements) {
+		const value = element.getAttribute("content");
 		if (value) {
 			addCandidate(value, "structured");
 		}
-	});
+	}
 
 	return Array.from(candidates.values());
 }

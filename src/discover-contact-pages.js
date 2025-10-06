@@ -1,4 +1,4 @@
-import { load } from "cheerio";
+import { parse } from "node-html-parser";
 
 const CONTACT_KEYWORDS = [
 	"contact",
@@ -20,16 +20,17 @@ const CONTACT_KEYWORDS = [
  * @returns {string[]} Array of absolute URLs to potential contact pages
  */
 export function discoverContactPages(html, baseUrl) {
-	const $ = load(html);
+	const root = parse(html);
 	const contactUrls = new Set();
 	const base = new URL(baseUrl);
 
-	$("a[href]").each((_, element) => {
-		const href = $(element).attr("href");
-		const text = $(element).text().toLowerCase().trim();
+	const links = root.querySelectorAll("a[href]");
+	for (const element of links) {
+		const href = element.getAttribute("href");
+		const text = element.textContent.toLowerCase().trim();
 
 		if (!href) {
-			return;
+			continue;
 		}
 
 		// Check if link text or href contains contact keywords
@@ -38,7 +39,7 @@ export function discoverContactPages(html, baseUrl) {
 		);
 
 		if (!isContactLink) {
-			return;
+			continue;
 		}
 
 		try {
@@ -54,7 +55,7 @@ export function discoverContactPages(html, baseUrl) {
 		} catch {
 			// Invalid URL, skip
 		}
-	});
+	}
 
 	return Array.from(contactUrls).slice(0, 5); // Limit to 5 pages
 }

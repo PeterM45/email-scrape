@@ -23,6 +23,7 @@
 		"test": "node --test test/index.test.js",
 		"test:integration": "node --test test/integration.test.js",
 		"test:all": "node --test",
+		"benchmark": "node --test test/benchmark.test.js",
 		"clean": "node scripts/clean.mjs",
 		"release": "changeset publish"
 	},
@@ -43,6 +44,6 @@
 		"@changesets/cli": "^2.29.7"
 	},
 	"dependencies": {
-		"cheerio": "^1.1.2"
+		"node-html-parser": "^7.0.1"
 	}
 }

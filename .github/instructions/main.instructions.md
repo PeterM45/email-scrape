@@ -11,7 +11,7 @@ applyTo: '**'
 ### Core Pipeline (src/index.js)
 The main scraping flow follows this sequence:
 1. **Fetch HTML** (`fetch-html.js`) - Retrieve content with custom fetch impl, validates HTML content-type
-2. **Extract Candidates** (`extract-candidates.js`) - Parse HTML using Cheerio to find emails from multiple sources
+2. **Extract Candidates** (`extract-candidates.js`) - Parse HTML using node-html-parser to find emails from multiple sources
 3. **Discover Contact Pages** (`discover-contact-pages.js`) - Automatically find `/contact`, `/about` pages (if `followContactPages: true`)
 4. **Rank Candidates** - Score emails by source quality + keyword bonuses, return sorted list
 
@@ -44,6 +44,7 @@ When main page fetch fails AND `followContactPages: true`:
 ### Testing
 - **Unit tests**: `pnpm test` (runs `test/index.test.js` with Node's built-in test runner)
 - **Integration tests**: `pnpm test:integration` (hits live websites - may be slow/flaky)
+- **Benchmark tests**: `pnpm benchmark` (runs performance benchmarks in `test/benchmark.test.js`)
 - **All tests**: `pnpm test:all`
 - Use `createFetch()` helper in tests to mock fetch responses with custom status/headers
 
@@ -70,14 +71,15 @@ When main page fetch fails AND `followContactPages: true`:
 - Contact page fetch errors are **silently caught** (logged to console.warn) - main page results still returned
 - Main page fetch errors are **propagated** (unless fallback succeeds)
 
-### Cheerio Usage
-Always use Cheerio for HTML parsing:
+### node-html-parser Usage
+Always use node-html-parser for HTML parsing:
 ```javascript
-const $ = load(html);
-$('a[href^="mailto:"]').each((_, element) => {
-  const href = $(element).attr("href");
+const root = parse(html);
+const links = root.querySelectorAll('a[href^="mailto:"]');
+for (const element of links) {
+  const href = element.getAttribute("href");
   // ...
-});
+}
 ```
 
 ### Constants Pattern
@@ -97,7 +99,7 @@ Always reset `lastIndex` before using: `EMAIL_GLOBAL_REGEX.lastIndex = 0;`
 
 ## Integration Points
 
-- **Cheerio**: HTML parsing library (only production dependency)
+- **node-html-parser**: HTML parsing library (only production dependency)
 - **Global fetch**: Accepts custom fetch implementations via options (enables testing with mocks)
 - **AbortSignal**: Supports request cancellation via `options.signal`
 
