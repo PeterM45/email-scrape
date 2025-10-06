@@ -1,6 +1,6 @@
 {
 	"name": "email-scrape",
-	"version": "0.6.0",
+	"version": "0.6.1",
 	"description": "Toolkit for extracting email addresses from HTML and remote websites",
 	"type": "module",
 	"main": "src/index.js",
