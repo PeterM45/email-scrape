@@ -1,5 +1,11 @@
 # email-scrape
 
+## 0.7.1
+
+### Patch Changes
+
+- faf5022: Add `benchmark` script to package.json for running performance benchmarks. This provides a convenient way to measure and track the library's performance over time.
+
 ## 0.7.0
 
 ### Minor Changes
