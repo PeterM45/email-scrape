@@ -29,10 +29,7 @@ export function extractEmails(input: string): string[];
  * @param options - Optional fetch configuration
  * @returns Promise resolving to array of ranked email addresses
  */
-export function scrapeEmailsFromWebsite(
-	url: string,
-	options?: FetchOptions,
-): Promise<string[]>;
+export function scrapeEmailsFromWebsite(url: string, options?: FetchOptions): Promise<string[]>;
 
 /**
  * Convenience helper returning only the highest-ranked email from a webpage.
@@ -41,10 +38,7 @@ export function scrapeEmailsFromWebsite(
  * @param options - Optional fetch configuration
  * @returns Promise resolving to the top-ranked email or null if none found
  */
-export function scrapeEmailFromWebsite(
-	url: string,
-	options?: FetchOptions,
-): Promise<string | null>;
+export function scrapeEmailFromWebsite(url: string, options?: FetchOptions): Promise<string | null>;
 
 /**
  * Fetch HTML content from a URL using the provided fetch implementation.
@@ -57,7 +51,7 @@ export function scrapeEmailFromWebsite(
 export function fetchHtml(
 	url: string,
 	fetchImpl?: typeof fetch,
-	options?: Omit<FetchOptions, "fetch">,
+	options?: Omit<FetchOptions, "fetch">
 ): Promise<string>;
 
 /**

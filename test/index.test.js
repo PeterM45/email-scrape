@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-	extractEmails,
-	scrapeEmailFromWebsite,
-	scrapeEmailsFromWebsite,
-} from "../src/index.js";
+import { extractEmails, scrapeEmailFromWebsite, scrapeEmailsFromWebsite } from "../src/index.js";
 
 const createFetch =
 	(html, { status = 200, headers = {} } = {}) =>
@@ -20,8 +16,7 @@ const createFetch =
 	});
 
 test("extractEmails normalizes punctuation and casing", () => {
-	const input =
-		"Email Support@Example.com, sales@example.com; support@example.com!";
+	const input = "Email Support@Example.com, sales@example.com; support@example.com!";
 	const emails = extractEmails(input);
 
 	assert.deepEqual(emails.sort(), ["sales@example.com", "support@example.com"]);
@@ -49,11 +44,7 @@ test("scrapeEmailsFromWebsite ranks candidates by source", async () => {
 		}),
 	});
 
-	assert.deepEqual(emails, [
-		"contact@example.com",
-		"meta@example.com",
-		"support@example.com",
-	]);
+	assert.deepEqual(emails, ["contact@example.com", "meta@example.com", "support@example.com"]);
 });
 
 test("scrapeEmailFromWebsite returns highest ranked candidate", async () => {
@@ -78,7 +69,7 @@ test("scrapeEmailFromWebsite returns highest ranked candidate", async () => {
 test("scrapeEmailsFromWebsite rejects invalid URLs", async () => {
 	await assert.rejects(
 		() => scrapeEmailsFromWebsite("/relative"),
-		new TypeError("url must be a valid absolute URL"),
+		new TypeError("url must be a valid absolute URL")
 	);
 });
 
@@ -93,8 +84,7 @@ test("extractEmails handles emails after phone numbers", () => {
 	assert.deepEqual(emails2, ["contact@site.org"]);
 
 	// With proper spacing, should still work
-	const goodInput =
-		"Call 878-5717 or email info@example.com, or contact@site.org";
+	const goodInput = "Call 878-5717 or email info@example.com, or contact@site.org";
 	const emails = extractEmails(goodInput);
 	assert.deepEqual(emails.sort(), ["contact@site.org", "info@example.com"]);
 });
@@ -144,8 +134,7 @@ test("scrapeEmailsFromWebsite discovers and scrapes contact pages", async () => 
 			statusText: "OK",
 			text: async () => html,
 			headers: {
-				get: (name) =>
-					name.toLowerCase() === "content-type" ? "text/html" : null,
+				get: (name) => (name.toLowerCase() === "content-type" ? "text/html" : null),
 			},
 		});
 	};
@@ -156,10 +145,7 @@ test("scrapeEmailsFromWebsite discovers and scrapes contact pages", async () => 
 	});
 
 	assert.ok(fetchCount > 1, "Should fetch contact page");
-	assert.ok(
-		emails.includes("support@example.com"),
-		"Should find email from contact page",
-	);
+	assert.ok(emails.includes("support@example.com"), "Should find email from contact page");
 });
 
 test("scrapeEmailsFromWebsite can skip contact pages", async () => {
@@ -262,18 +248,18 @@ test("handles 404 with fallback to /contact", async () => {
 	// Should have attempted the 404 page
 	assert.ok(
 		fetchedUrls.some((url) => url.includes("/404page")),
-		"Should try to fetch the main page",
+		"Should try to fetch the main page"
 	);
 
 	// Should have fallen back to contact page
 	assert.ok(
 		fetchedUrls.some((url) => url.includes("/contact")),
-		"Should fall back to /contact page after 404",
+		"Should fall back to /contact page after 404"
 	);
 
 	// Should extract email from contact page
 	assert.ok(
 		emails.includes("contact@example.com"),
-		"Should extract email from fallback contact page",
+		"Should extract email from fallback contact page"
 	);
 });

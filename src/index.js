@@ -64,9 +64,7 @@ export async function scrapeEmailsFromWebsite(url, options = {}) {
 			try {
 				const baseUrl = new URL(normalizedUrl);
 				const contactUrl = `${baseUrl.origin}/contact`;
-				console.warn(
-					`Main page failed (${error.message}), trying fallback: ${contactUrl}`,
-				);
+				console.warn(`Main page failed (${error.message}), trying fallback: ${contactUrl}`);
 				html = await fetchHtml(contactUrl, fetchImpl, fetchOptions);
 			} catch (_fallbackError) {
 				// Both main page and fallback failed
@@ -86,19 +84,12 @@ export async function scrapeEmailsFromWebsite(url, options = {}) {
 
 		for (const contactUrl of contactUrls) {
 			try {
-				const contactHtml = await fetchHtml(
-					contactUrl,
-					fetchImpl,
-					fetchOptions,
-				);
+				const contactHtml = await fetchHtml(contactUrl, fetchImpl, fetchOptions);
 				const contactCandidates = extractCandidates(contactHtml);
 				candidates.push(...contactCandidates);
 			} catch (error) {
 				// Silently fail for contact pages - still return main page results
-				console.warn(
-					`Failed to scrape contact page ${contactUrl}:`,
-					error.message,
-				);
+				console.warn(`Failed to scrape contact page ${contactUrl}:`, error.message);
 			}
 		}
 	}

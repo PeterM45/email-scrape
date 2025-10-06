@@ -15,5 +15,5 @@ await Promise.all(
 		} catch (error) {
 			process.stderr.write(`Failed to remove ${dir}: ${error.message}\n`);
 		}
-	}),
+	})
 );

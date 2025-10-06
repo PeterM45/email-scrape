@@ -8,6 +8,12 @@ import {
 } from "./constants.js";
 import { extractEmails, sanitizeEmail } from "./sanitize.js";
 
+/**
+ * Extract email candidates from HTML content.
+ *
+ * @param {string} html - HTML content to parse
+ * @returns {Array<{email: string, score: number, source: string}>} Array of email candidates
+ */
 export function extractCandidates(html) {
 	const $ = load(html);
 	const candidates = new Map();
@@ -63,6 +69,12 @@ export function extractCandidates(html) {
 	return Array.from(candidates.values());
 }
 
+/**
+ * Rank email candidates by score (descending), then alphabetically.
+ *
+ * @param {Array<{email: string, score: number, source: string}>} candidates - Email candidates to rank
+ * @returns {Array<{email: string, score: number, source: string}>} Sorted candidates
+ */
 export function rankCandidates(candidates) {
 	return candidates.sort((a, b) => {
 		if (b.score !== a.score) {

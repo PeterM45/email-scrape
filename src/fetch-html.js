@@ -14,11 +14,7 @@ import { DEFAULT_ACCEPT_HEADER, DEFAULT_USER_AGENT } from "./constants.js";
  * @param {typeof fetch} fetchImpl
  * @param {FetchOptions} [options]
  */
-export async function fetchHtml(
-	url,
-	fetchImpl = globalThis.fetch,
-	options = {},
-) {
+export async function fetchHtml(url, fetchImpl = globalThis.fetch, options = {}) {
 	if (typeof fetchImpl !== "function") {
 		throw new Error("A fetch implementation must be provided.");
 	}
@@ -36,14 +32,12 @@ export async function fetchHtml(
 	});
 
 	if (!response || typeof response.text !== "function") {
-		throw new Error(
-			"The provided fetch implementation did not return a valid response.",
-		);
+		throw new Error("The provided fetch implementation did not return a valid response.");
 	}
 
 	if (!response.ok) {
 		throw new Error(
-			`Failed to fetch URL: ${response.status ?? ""} ${response.statusText ?? ""}`.trim(),
+			`Failed to fetch URL: ${response.status ?? ""} ${response.statusText ?? ""}`.trim()
 		);
 	}
 
@@ -54,7 +48,7 @@ export async function fetchHtml(
 		!contentType.includes("application/xhtml+xml")
 	) {
 		throw new Error(
-			`Unexpected content-type for ${url}: ${contentType}. Only HTML responses are supported.`,
+			`Unexpected content-type for ${url}: ${contentType}. Only HTML responses are supported.`
 		);
 	}
 

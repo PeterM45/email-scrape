@@ -2,6 +2,12 @@ import { createEmailGlobalRegex, EMAIL_VALIDATION_REGEX } from "./constants.js";
 
 const EMAIL_GLOBAL_REGEX = createEmailGlobalRegex();
 
+/**
+ * Sanitize and validate a raw email address string.
+ *
+ * @param {string} raw - Raw email string to sanitize
+ * @returns {string|null} Lowercase email if valid, null otherwise
+ */
 export function sanitizeEmail(raw) {
 	if (typeof raw !== "string") {
 		return null;
@@ -61,6 +67,12 @@ export function sanitizeEmail(raw) {
 	return lower;
 }
 
+/**
+ * Normalize and deduplicate an array of email strings.
+ *
+ * @param {string[]} inputs - Array of raw email strings
+ * @returns {string[]} Array of unique, sanitized emails
+ */
 export function normalizeEmails(inputs) {
 	const unique = new Set();
 	for (const input of inputs ?? []) {
@@ -72,6 +84,12 @@ export function normalizeEmails(inputs) {
 	return Array.from(unique);
 }
 
+/**
+ * Extract all valid email addresses from a text string.
+ *
+ * @param {string} input - Text to extract emails from
+ * @returns {string[]} Array of unique, sanitized emails
+ */
 export function extractEmails(input) {
 	if (typeof input !== "string") {
 		return [];

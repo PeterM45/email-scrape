@@ -34,8 +34,7 @@ export function discoverContactPages(html, baseUrl) {
 
 		// Check if link text or href contains contact keywords
 		const isContactLink = CONTACT_KEYWORDS.some(
-			(keyword) =>
-				text.includes(keyword) || href.toLowerCase().includes(keyword),
+			(keyword) => text.includes(keyword) || href.toLowerCase().includes(keyword)
 		);
 
 		if (!isContactLink) {

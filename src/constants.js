@@ -1,8 +1,11 @@
-// Email pattern - must start with a letter
-// Allows digits before (handles phone numbers like "123-456-7890info@example.com")
-// Prevents letters/dots before (avoids matching middle of emails like "test.info@example.com")
-// TLD limited to 2-63 characters (RFC compliant), but non-greedy to prevent over-matching
-// Followed by non-letter or end of string to prevent matching "comFollow" as single TLD
+/**
+ * Email pattern regex string.
+ * - Must start with a letter
+ * - Allows digits before @ (handles "123-456-7890info@example.com")
+ * - Prevents letters/dots before @ (avoids matching middle of emails)
+ * - TLD: 2-63 characters (RFC compliant), non-greedy
+ * - Followed by non-letter or end of string (prevents "comFollow" as TLD)
+ */
 export const EMAIL_PATTERN =
 	"(?<![a-zA-Z.])[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\\.[a-zA-Z]{2,63}?(?![a-z])";
 
