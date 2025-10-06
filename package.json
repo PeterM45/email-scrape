@@ -23,7 +23,6 @@
 		"test": "node --test test/index.test.js",
 		"test:integration": "node --test test/integration.test.js",
 		"test:all": "node --test",
-		"benchmark": "node --test test/benchmark.test.js",
 		"clean": "node scripts/clean.mjs",
 		"release": "changeset publish"
 	},
@@ -31,10 +30,14 @@
 		"email",
 		"scrape",
 		"crawler",
-		"contact"
+		"contact",
+		"email-finder",
+		"email-scraper",
+		"email-extractor",
+		"lead-generation",
+		"web-scraping"
 	],
-	"author": "",
-	"license": "MIT",
+	"author": "Peter M",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/PeterM45/email-scrape.git"

@@ -107,8 +107,3 @@ pnpm install
 pnpm lint
 pnpm test
 ```
-
-## License
-
-MIT
-
